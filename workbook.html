@@ -1,0 +1,473 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'"><meta name="description" content="自社のKPIマネジメント運用シート"><title>KPIマネジメント運用シート：ゴールから施策・見直しまで｜開発組織のKPIマネジメント実践ガイド</title><style>/* Design tokens: one light palette, one spacing rhythm, one type scale. */
+:root{
+ color-scheme:light;
+ --paper:#faf8f4;--surface:#ffffff;--sunken:#f2efe8;
+ --ink:#2b2724;--ink-soft:#4a443f;--muted:#6a6159;
+ --line:#e6e1d8;--line-strong:#cdc5b8;--field-line:#8b837a;
+ --accent:#9c4527;--accent-strong:#7e3419;--tint:#f8ece6;
+ --warn:#b01f4a;--warn-tint:#fceaef;
+ --evidence-measured:#2b2724;--evidence-defined:#4a443f;--evidence-common:#6a6159;
+ --relation-component-ink:#23568c;--relation-component-bg:#ebf1f8;
+ --relation-breakdown-ink:#235f4b;--relation-breakdown-bg:#eaf2ee;
+ --relation-conversion-ink:#6a4194;--relation-conversion-bg:#f2ecf8;
+ --relation-reference-ink:#4e5865;--relation-reference-bg:#eeeff2;
+ --relation-influence-ink:#665e13;--relation-influence-bg:#fbf1d6;
+ --button-ink:#ffffff;
+ --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;
+ /* 視覚語彙の割り当て。ここに書いていない意味を、色・線・形へ新しく載せない。
+    増やすときはこの表を先に更新し、既存の割り当てとぶつからないか確かめる。
+    暖色 --accent   = 操作・現在地と、本資料の原則（.callout の左罫）。図の中では罫線・矢印
+                      だけに使い、文字色には使わない（文字が押せる要素に見えるため）。
+                      現状の例外は .eyebrow の文字色と .checklist の□（T-20260906-ep）。
+    破線            = 検証前・未確定のもの（通説の根拠区分、架空の記入例、関係の「影響・論理」）。
+                      確定した分類・計算関係へ破線を使わない。
+    点線・二重線・太い左罫 = 関係の種類（換算・内訳・参照）。破線と役割が競合しないよう分けた。
+    明度 --evidence-* = 根拠区分の強さ（実測 >= 定義 >= 通説）。色相では区別しない。
+    書体            = 見出しから本文まで --font-body（ゴシック）で一律。等幅は計算式
+                      （.formula）と英語表記（.row-en）だけが持つ。太さ 700 は見出しと本文を
+                      分けるほか、ラベル・表見出し・バッジの強調（.eyebrow・.nav-label・th・
+                      .grade.a・.badge.relation-badge など）にも使う。見出しの階層は太さで
+                      変えず、文字の大きさと上余白で示す（h1・h2・h3 はどれも 700）。
+                      根拠区分・関係の種類・警告の区別は、太さ以外を書体に載せない。明朝（セリフ）は使わない。端末によって和文の候補が
+                      無く、欧文セリフ＋和文ゴシックの混植になるため。端末にある標準の
+                      書体だけを使い、外部フォントは読み込まない。
+    地色 --tint     = 現在地・選択・一部のホバーと、.outcome・.tree-node・.eyebrow の面、
+                      guide-5 のフロー図の箱。用途の整理は未決（T-20260906-eo・-ep）。
+         --sunken   = 沈めた面（表の見出し、ガードレール枠、架空の記入例、検索0件、
+                      guide-1・guide-3・guide-4 の図の中の沈めた面）と、
+                      表の行・サイドバー下位リンクのホバー。
+         --warn-tint = 警告の淡色地。
+    関係図（guide-2）= 作用線（実線・矢印）／観測線（細い実線・矢印なし）／影響線（破線・矢印）。
+    フロー図（guide-5）= 判断の矢印1種と、分岐ラベル。
+    順序図（guide-1）= 段を進む矢印1種と、段の枠（--line-strong）／段の中の欄（--line）。
+                      言い換える前の「手段の言葉」だけ --sunken の面に置く。
+    優先順位図（guide-3）= 番号付きの帯（上ほど先に置く）と、分布の目盛り。閾値の出発点は
+                      --accent の縦線、四分位範囲の箱と注記の帯は --sunken。
+    一巡図（guide-4）= 手順の矢印1種と、左を回る戻りの矢印。会議の中の順序だけ --sunken の小箱。
+    新しい図でも破線は使わない（検証前・未確定の意味を持つため。上の破線の行）。
+    影響の4段階（実験・準実験・相関・論理）には視覚の割り当てを持たせていない。
+    未決・例外の T- から始まるIDは、このリポジトリの課題一覧の行を指す。 */
+ /* 角丸は部品にだけ使う。面（枠・表・折り畳み）は角なしで統一する。
+    --r=押せる要素（ボタン・入力欄・困りごとの選択・本文へのスキップ）、
+    --r-sm=根拠区分バッジとフォーカス枠、--r-pill=ラベル。 */
+ --r-sm:3px;--r:6px;--r-pill:999px;
+ --shell:1240px;--measure:46em;
+ --ease:160ms cubic-bezier(.2,.6,.3,1);
+ --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+ font-family:var(--font-body);
+ font-feature-settings:"palt" 1;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:96px}
+body{margin:0;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.9;letter-spacing:.01em;-webkit-text-size-adjust:100%}
+
+/* Base elements */
+a{color:var(--accent);text-underline-offset:4px;text-decoration-thickness:1px}
+a:hover{color:var(--accent-strong);text-decoration-thickness:2px}
+button,input,select,textarea{font:inherit}
+button,a,input,select,textarea,summary{touch-action:manipulation}
+button{cursor:pointer}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:var(--r-sm)}
+[hidden]{display:none!important}
+svg{max-width:100%;height:auto}
+code{overflow-wrap:anywhere}
+h2,h3{color:var(--ink);text-wrap:pretty}
+h2{font-size:22px;font-weight:700;line-height:1.65;margin:var(--s7) 0 var(--s3)}
+h3{font-size:17px;font-weight:700;line-height:1.7;margin:var(--s6) 0 var(--s2)}
+p{margin:var(--s3) 0 var(--s4);max-width:var(--measure)}
+section{scroll-margin-top:96px}
+li{margin-bottom:var(--s1)}
+ul,ol{max-width:var(--measure)}
+.small{font-size:12.5px;line-height:1.85;color:var(--muted)}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.anchor-alias{scroll-margin-top:96px}
+.skip{position:absolute;top:-100px;left:20px;background:var(--surface);border:1px solid var(--accent);border-radius:var(--r);padding:12px 16px;z-index:30}
+.skip:focus{top:10px}
+
+/* Header and site navigation */
+.site-header{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line-strong)}
+.header-inner{max-width:var(--shell);margin:auto;padding:var(--s4) var(--s7);display:flex;justify-content:space-between;gap:var(--s5);align-items:center}
+.brand{color:var(--ink);text-decoration:none;font-size:15px;font-weight:700;line-height:1.6}
+.brand small{display:block;margin-top:3px;font-size:11.5px;font-weight:400;line-height:1.6;color:var(--muted);text-wrap:balance}
+.brand:hover{color:var(--accent)}
+.top-nav{display:flex;gap:var(--s5);align-items:center;flex-wrap:wrap}
+.top-nav a{position:relative;color:var(--muted);font-size:13px;text-decoration:none;padding:2px 0;transition:color var(--ease)}
+.top-nav a:hover{color:var(--ink)}
+.top-nav a[aria-current=page]{color:var(--ink);font-weight:700}
+.top-nav a[aria-current=page]::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:2px;background:var(--accent)}
+
+/* Two-column shell: chapter index beside a measured reading column */
+.layout{max-width:var(--shell);margin:auto;display:grid;grid-template-columns:208px minmax(0,1fr);gap:var(--s8);padding:var(--s7) var(--s7) var(--s6)}
+main{min-width:0;max-width:940px;padding-bottom:var(--s8)}
+.sidebar{font-size:12.5px}
+.sidebar-inner{position:sticky;top:104px}
+.nav-label{font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--s2)}
+.sidebar ol,.sidebar ul{list-style:none;padding:0;margin:0 0 var(--s6)}
+.sidebar li{margin:0}
+.sidebar ol a,.sidebar ul a{display:grid;grid-template-columns:22px minmax(0,1fr);gap:var(--s2);align-items:baseline;color:var(--muted);text-decoration:none;padding:7px 10px;border-left:1px solid var(--line);line-height:1.7;transition:color var(--ease),background var(--ease),border-color var(--ease)}
+.sidebar ul a{display:block}
+.sidebar ol a:hover,.sidebar ul a:hover{color:var(--ink);background:var(--sunken)}
+.sidebar a[aria-current=page]{color:var(--accent);font-weight:700;background:var(--tint);border-left:2px solid var(--accent)}
+.sidebar ol a>span:last-child{min-width:0;overflow-wrap:anywhere}
+.chapter-number{flex:none;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.sidebar a[aria-current=page] .chapter-number{color:var(--accent)}
+.sidebar-inner>.small{color:var(--muted);line-height:1.9}
+
+/* Page opening */
+.page-head{padding:0 0 var(--s5);margin:0 0 var(--s6);border-bottom:1px solid var(--line)}
+.page-head h1{font-size:clamp(26px,2.6vw,35px);font-weight:700;line-height:1.6;letter-spacing:0;margin:var(--s2) 0 var(--s4);max-width:22em;text-wrap:pretty}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--accent);margin:0}
+.lead{max-width:40em;color:var(--ink-soft);font-size:15.5px;line-height:1.95;margin-bottom:0}
+.page-head.theme-head{border-bottom:2px solid var(--line-strong)}
+.theme-head .eyebrow{display:inline-block;background:var(--tint);border-left:3px solid var(--line-strong);color:var(--accent);padding:5px 12px}
+.section-top{display:flex;justify-content:space-between;gap:var(--s4);align-items:baseline;margin:var(--s7) 0 var(--s4)}
+.section-top h2{margin:0}
+
+/* Home: three ways in */
+.home-intro{margin-bottom:var(--s5)}
+.home-entries{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);margin:var(--s6) 0}
+.home-entry{display:flex;flex-direction:column;border:1px solid var(--line);border-top:3px solid var(--line-strong);background:var(--surface);padding:var(--s5)}
+.home-entry .eyebrow{margin:0 0 var(--s2)}
+.home-entry h2{margin:0 0 var(--s3);font-size:20px}
+.home-entry p{font-size:14px;color:var(--muted);margin:0 0 var(--s4)}
+/* 3枠は文量が揃わないため、余った高さは本文の下に集め、ボタンの位置を揃える。 */
+.home-entry .button{margin-top:auto;align-self:flex-start}
+.home-principle{font-size:14px;font-weight:700;color:var(--ink);margin:var(--s4) 0 0}
+
+/* Chapter list: an index, not a wall of boxes */
+.cards{display:block;border-top:1px solid var(--line)}
+.card{display:grid;grid-template-columns:188px minmax(0,1fr) 20px;column-gap:var(--s4);row-gap:2px;padding:var(--s4) var(--s2);border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;transition:background var(--ease)}
+.card .number{grid-column:1;grid-row:1 / 3;align-self:center;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.04em;line-height:1.7;text-wrap:balance}
+.card h3,.card h4{grid-column:2;grid-row:1;margin:0;font-size:16.5px;line-height:1.7}
+.card p{grid-column:2;grid-row:2;margin:0;max-width:none;font-size:13px;line-height:1.85;color:var(--muted)}
+.card .arrow{grid-column:3;grid-row:1 / 3;align-self:center;color:var(--line-strong);transition:color var(--ease)}
+.card:hover{background:var(--tint)}
+.card:hover h3{text-decoration:underline;text-underline-offset:4px}
+.card:hover .arrow{color:var(--accent)}
+
+/* Blocks of guidance, examples, and asides */
+.panel,.outcome{padding:var(--s5);margin:var(--s5) 0}
+.outcome{background:var(--tint)}
+/* 対にする指標の枠は、行動を促す .outcome の箱と同じ見た目にしない。 */
+.panel{background:var(--surface);border:1px solid var(--line-strong)}
+/* 超えたら止める閾値を置く枠。破線（通説・架空例・影響）と警告色（AI解釈注意）は使わず、地色と上罫で定義式（.formula）とも分ける。 */
+.guardrail{background:var(--sunken);border-top:3px solid var(--ink-soft)}
+.callout{background:transparent;border-left:2px solid var(--accent);border-radius:0;padding:var(--s1) 0 var(--s1) var(--s5);margin:var(--s5) 0}
+.example{border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-left:3px solid var(--line-strong);padding:var(--s5) 0 var(--s5) var(--s5);margin:var(--s5) 0}
+:is(.panel,.callout,.outcome,.example)>:first-child{margin-top:0}
+:is(.panel,.callout,.outcome,.example)>:last-child{margin-bottom:0}
+/* Fictional worked examples never pass for measured evidence. */
+.example.fictional-example{background:var(--sunken);border:2px dashed var(--line-strong);border-left:4px dashed var(--ink-soft);padding:var(--s5);margin:var(--s6) 0}
+.fictional-example>.badge{background:var(--ink);color:var(--button-ink);border-color:var(--ink);font-size:12.5px;font-weight:700;padding:4px 12px;margin-bottom:var(--s1)}
+.fictional-example>h3{margin-top:var(--s2)}
+/* Interim: the whole-sheet worked example is fictional too. See docs/TODOs.md. */
+#complete-example>.small>.badge{background:var(--ink);color:var(--button-ink);border-color:var(--ink);font-size:12px;font-weight:700}
+#complete-example>details{background:var(--sunken);border:2px dashed var(--line-strong)}
+#complete-example>details[open]{background:var(--sunken)}
+
+/* Labels: evidence grade, role tags, relation types */
+.badge,.grade,.tag{display:inline-block;padding:2px 9px;border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r-pill);font-size:11.5px;line-height:1.7;color:var(--muted);margin-right:var(--s1)}
+/* Evidence grade: a shape of its own, ordered measured >= defined >= common talk. */
+.grade{border-radius:var(--r-sm)}
+.grade.a{border-color:var(--evidence-measured);color:var(--evidence-measured);font-weight:700}
+.grade.b{border-color:var(--field-line);color:var(--evidence-defined)}
+.grade.c{border-style:dashed;border-color:var(--field-line);color:var(--evidence-common)}
+.badge.relation-badge{color:var(--relation-ink);background:var(--relation-bg);border-color:var(--relation-ink);font-weight:700;white-space:nowrap}
+/* 関係5種は色相だけで分けない。色を判別できなくても枠の形で読み分けられるようにする。
+   破線は「検証前・未確定」に予約してあるため、確定した分類の内訳には使わない。 */
+.relation-component{--relation-ink:var(--relation-component-ink);--relation-bg:var(--relation-component-bg)}
+.relation-breakdown{--relation-ink:var(--relation-breakdown-ink);--relation-bg:var(--relation-breakdown-bg);border-style:double;border-width:3px;padding:0 7px}
+.relation-conversion{--relation-ink:var(--relation-conversion-ink);--relation-bg:var(--relation-conversion-bg);border-style:dotted;border-width:2px;padding:1px 8px}
+.relation-reference{--relation-ink:var(--relation-reference-ink);--relation-bg:var(--relation-reference-bg);border-left-width:4px;padding-left:6px}
+.relation-influence{--relation-ink:var(--relation-influence-ink);--relation-bg:transparent;border-style:dashed}
+/* 関係の凡例。実物と同じ印を縦に並べ、本文で出会う形と一致させる。 */
+.relation-legend{list-style:none;padding:0;margin:var(--s3) 0}
+.relation-legend li{display:grid;grid-template-columns:7.5em minmax(0,1fr);gap:var(--s3);align-items:baseline;padding:var(--s2) 0;border-top:1px solid var(--line);margin:0}
+.relation-legend .badge{margin-right:0;justify-self:start}
+@media(max-width:720px){.relation-legend li{grid-template-columns:1fr;gap:var(--s1)}}
+
+/* Lists that carry procedure */
+.steps-list{padding-left:var(--s5)}
+.steps-list li{padding:var(--s1) 0 var(--s3) var(--s2)}
+.checklist{list-style:none;padding:0;max-width:var(--measure)}
+.checklist li{padding:var(--s3) 0;border-bottom:1px solid var(--line);margin:0}
+.checklist li:before{content:'□';color:var(--accent);margin-right:var(--s2)}
+.guard-list{list-style:none;padding:0;margin:var(--s3) 0 var(--s4);max-width:var(--measure)}
+.guard-list li{padding:var(--s2) 0 var(--s2) var(--s4);border-top:1px solid var(--line);margin:0;position:relative;font-weight:600;line-height:1.8}
+.guard-list li:before{content:'▸';position:absolute;left:0;color:var(--ink-soft);font-weight:400}
+.source-list{padding-left:var(--s5)}
+.source-list li{margin:var(--s3) 0}
+
+/* Controls */
+.button{display:inline-block;border:1px solid var(--accent);background:var(--accent);color:var(--button-ink);padding:9px 18px;border-radius:var(--r);text-decoration:none;font-size:13.5px;font-weight:500;transition:background var(--ease),border-color var(--ease)}
+.button:hover{background:var(--accent-strong);border-color:var(--accent-strong);color:var(--button-ink);text-decoration:none}
+.button.secondary{background:var(--surface);color:var(--accent)}
+.button.secondary:hover{background:var(--tint);color:var(--accent-strong)}
+.actions{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s4)}
+label{display:block;font-size:13px;font-weight:600}
+input,select,textarea{display:block;width:100%;min-width:0;margin-top:var(--s1);border:1px solid var(--field-line);background:var(--surface);color:var(--ink);border-radius:var(--r);padding:10px 12px;transition:border-color var(--ease),box-shadow var(--ease)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{min-height:125px;resize:vertical;font-weight:400;font-size:14px;line-height:1.9}
+.status{font-size:13px;color:var(--ink-soft);min-height:24px}
+.search-controls{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:var(--s4);padding:var(--s4) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:var(--s3)}
+/* 検索0件は状態の表示。地色で面にする。中央寄せは戻さない（本文の左揃えを崩すため）。 */
+.empty-state{background:var(--sunken);padding:var(--s5);border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line)}
+
+/* Catalog: mode switch, problem picker, metric list */
+.catalog-modes{display:flex;gap:var(--s5);flex-wrap:wrap;border-bottom:1px solid var(--line);margin:var(--s5) 0}
+.catalog-modes button{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);padding:10px 0;transition:color var(--ease),border-color var(--ease)}
+.catalog-modes button:hover{color:var(--ink)}
+.catalog-modes button[aria-pressed=true]{color:var(--ink);font-weight:700;border-bottom-color:var(--accent)}
+.problem-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
+.problem-choice{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink);text-align:left;padding:var(--s4);font-size:14px;line-height:1.8;transition:background var(--ease),border-color var(--ease)}
+.problem-choice:hover{border-color:var(--accent)}
+.problem-choice[aria-pressed=true]{background:var(--tint);border-color:var(--accent);font-weight:600}
+#catalog-explore .search-controls{grid-template-columns:1fr;border:0;padding:0;margin:var(--s5) 0}
+#catalog-explore .search-controls:has(label[hidden]+label[hidden]){display:none}
+.metric-group{margin-top:var(--s6)}
+.metric-group>h2{font-size:20px}
+.metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--s6)}
+.metric-card{border-top:1px solid var(--line-strong);padding:var(--s5) 0}
+.metric-card .tag{border:0;background:transparent;padding:0;color:var(--muted)}
+.metric-card h3{font-size:17px;margin:var(--s2) 0}
+.metric-card h3 a{color:var(--ink);text-decoration:none}
+.metric-card h3 a:hover{color:var(--accent);text-decoration:underline;text-underline-offset:4px}
+.metric-card p{font-size:13px;color:var(--muted);margin:var(--s2) 0}
+.metric-card .pair{padding-top:var(--s2);border-top:1px dotted var(--line-strong);font-size:13px;color:var(--ink-soft)}
+.metric-card .detail-link{font-size:13px}
+.metric-card>.ai-caution-badge{display:table;margin:var(--s2) 0;font-size:11.5px;font-weight:600;text-decoration-thickness:1px}
+
+/* Definitions, formulas, and disclosure */
+.formula{display:block;background:var(--surface);border:1px solid var(--line-strong);border-left:3px solid var(--ink-soft);padding:var(--s4);margin:var(--s3) 0;max-width:var(--measure);white-space:pre-wrap;overflow-wrap:normal;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,monospace;font-size:13px;line-height:1.85}
+.row-en{display:block;color:var(--muted);font-family:ui-monospace,SFMono-Regular,monospace;font-size:12px}
+/* 役割は見出し前のバッジ1行。バッジと選び分けへの導線を同じ行に置き、節を立てない。 */
+.role-line{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;margin:var(--s4) 0 var(--s5);font-size:13px}
+/* 根拠区分バッジは sources.html#grades へのリンク。バッジの見た目を保ちつつ、点線の下線でリンクと分かるようにする。 */
+a.grade{text-decoration:underline dotted;text-underline-offset:3px}
+a.grade:hover{text-decoration:underline solid;color:var(--ink)}
+.k{display:block;font-size:12px;color:var(--muted)}
+details{border:1px solid var(--line);background:var(--surface);margin:var(--s3) 0;padding:var(--s3) var(--s5)}
+details[open]{background:var(--paper)}
+summary{cursor:pointer;font-weight:650;padding:var(--s1) 0}
+details>div{padding:var(--s4) 0 0}
+
+/* Tables */
+.tablescroll{overflow-x:auto;max-width:100%;margin:var(--s5) 0;border:1px solid var(--line);background:var(--surface)
+  linear-gradient(to right,var(--surface),rgba(255,255,255,0)) left/24px 100% no-repeat local,
+  linear-gradient(to left,var(--surface),rgba(255,255,255,0)) right/24px 100% no-repeat local,
+  radial-gradient(farthest-side at 0 50%,rgba(43,39,36,.16),rgba(43,39,36,0)) left/12px 100% no-repeat scroll,
+  radial-gradient(farthest-side at 100% 50%,rgba(43,39,36,.16),rgba(43,39,36,0)) right/12px 100% no-repeat scroll}
+.tablescroll>table{background:transparent}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--surface)}
+.tablescroll:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+th,td{padding:12px var(--s4);text-align:left;vertical-align:top;border-bottom:1px solid var(--line);min-width:125px;line-height:1.8}
+th{background:var(--sunken);font-weight:700;color:var(--ink-soft);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+/* カウンターメトリクス早見表。行見出しは指標名と使い方の例の2行、真ん中の列は候補の並び。
+   表の中では guard-list の上下の余白を詰め、セルの高さを候補の数だけに保つ。 */
+#table th[scope="row"]{white-space:normal;min-width:170px}
+#table th[scope="row"] .small{display:block;font-weight:400}
+#table .guard-list{margin:0;max-width:none;font-size:13px}
+#table .guard-list li{font-weight:500}
+#table .guard-list li:first-child{border-top:0;padding-top:0}
+#table .guard-list+.small{margin-top:var(--s2)}
+tbody tr:hover td{background:var(--sunken)}
+
+/* KPI trees */
+.tree-node{border-left:2px solid var(--ink-soft);margin:var(--s3) 0 var(--s3) var(--s4);padding:var(--s2) var(--s4);background:var(--tint)}
+.tree-node h3{margin:0;font-size:15.5px}
+.tree-node p{font-size:13px;margin:var(--s1) 0}
+.tree-node .tree-node{background:var(--surface)}
+.tree-node .tree-node .tree-node{background:var(--tint)}
+
+/* Interpretation notice for metrics affected by AI adoption */
+.ai-caution-badge,.ai-caution-label{display:inline-block;border:1px solid var(--warn);padding:4px 10px;font-size:12px;font-weight:650;line-height:1.6}
+.ai-caution-badge{color:var(--warn);background:var(--surface);border-radius:var(--r-pill);text-decoration:underline;text-underline-offset:3px}
+a.ai-caution-badge:hover{background:var(--warn-tint);color:var(--warn)}
+.ai-caution-label{color:var(--warn);background:var(--surface);border-radius:var(--r-pill)}
+
+.ai-caution{border-left:3px solid var(--warn);padding:var(--s1) 0 var(--s1) var(--s5);margin:var(--s5) 0 var(--s7)}
+.ai-caution h2{font-size:19px;margin-top:var(--s4)}
+.ai-caution h3{font-size:16px}
+.ai-caution-legend{font-size:13px;line-height:1.9}
+
+/* Page footer and hand-off links */
+.next{display:flex;justify-content:space-between;gap:var(--s5);border-top:1px solid var(--line);padding-top:var(--s5);margin-top:var(--s7)}
+.next a{font-size:14px}
+.site-footer{max-width:var(--shell);margin:auto;border-top:1px solid var(--line);padding:var(--s5) var(--s7) var(--s6);font-size:12px;line-height:1.9;color:var(--muted);display:flex;justify-content:space-between;gap:var(--s5)}
+
+/* Worksheet */
+.sheet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s5)}
+.sheet-grid label{border-top:1px solid var(--line);padding:var(--s4) 0}
+.sheet-grid small{display:block;font-weight:400;color:var(--muted);margin-top:var(--s2);line-height:1.8}
+
+/* 図の共通枠。ラベルを読める大きさに保ち、狭い画面では図だけを横スクロールさせる。
+   図に角丸を使わない（--r は押せる要素の印）。図の文字に --accent を使わない（同上）。
+   最小幅は図ごとに違うため共通クラスに入れない。凡例のような小さい図に大きな最小幅を
+   掛けると、狭い画面で不要な横スクロールが出る。aria-label も図ごとに書く。 */
+.diagram{max-width:760px;margin:var(--s6) auto}
+.diagram-scroll{overflow-x:auto}
+.diagram-scroll:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.diagram svg{display:block;width:100%;height:auto;font-family:inherit}
+.diagram figcaption{margin-top:var(--s3);font-size:12px;color:var(--muted)}
+.diagram-wide svg{min-width:680px}
+
+@media(max-width:1000px){
+ .layout{grid-template-columns:176px minmax(0,1fr);gap:var(--s6);padding:var(--s6) var(--s6) var(--s5)}
+ .header-inner,.site-footer{padding-left:var(--s6);padding-right:var(--s6)}
+ .top-nav{gap:var(--s4)}
+ /* 3列に足りない幅では1列にする。2列にすると3枠目だけが2行目に単独で残り、同格に並べた入口が「2つ＋おまけ」に見える。 */
+ .home-entries{grid-template-columns:1fr}
+ /* 縦積みでは枠の高さが揃わないため、下端合わせをやめて本文の直後に置く。 */
+ .home-entry .button{margin-top:0}
+ .search-controls,.metric-grid{grid-template-columns:1fr}
+ .card{grid-template-columns:minmax(0,1fr) 20px;gap:4px var(--s3)}
+ .card .number{grid-column:1;grid-row:1}
+ .card h3,.card h4{grid-column:1;grid-row:2}
+ .card p{grid-column:1;grid-row:3}
+ .card .arrow{grid-column:2;grid-row:1 / 4}
+}
+@media(max-width:720px){
+ html{scroll-padding-top:16px}
+ section,.anchor-alias{scroll-margin-top:16px}
+ .site-header{position:static}
+ .header-inner{display:block;padding:var(--s4) var(--s5)}
+ .top-nav{margin-top:var(--s3);gap:var(--s2) var(--s4)}
+ .layout{display:flex;flex-direction:column;padding:var(--s5) var(--s5) var(--s6)}
+ .sidebar{order:2;margin-top:var(--s6);padding-top:var(--s5);border-top:1px solid var(--line)}
+ .sidebar-inner{position:static}
+ main{max-width:none}
+ .page-head{padding-bottom:var(--s5);margin-bottom:var(--s5)}
+ .page-head h1{font-size:26px;line-height:1.55;overflow-wrap:anywhere}
+ .lead{font-size:14px;line-height:1.85}
+ /* h2 の上余白は --s7 のまま残す。見出しは階層で太さを変えないため、この幅では
+    h3（17px・上余白 --s6）との差が大きさ3pxだけになり、節の入れ子が読めなくなる。 */
+ h2{font-size:20px}
+ .home-intro{padding-bottom:var(--s4);margin-bottom:var(--s4)}
+ .home-intro .eyebrow{display:none}
+ .home-entries,.problem-choices{grid-template-columns:1fr;gap:var(--s3);margin:var(--s4) 0}
+ /* 縦積みでは、前の枠の下罫と次の枠の上罫が続いて1つの区画に見える。入口の枠は数が多いため、間を空けて始点を示す。 */
+ .home-entries{gap:var(--s5)}
+ .home-entry{padding:var(--s4)}
+ .home-entry h2{font-size:19px;margin-bottom:var(--s2)}
+ .home-entry p{margin:0 0 var(--s3)}
+ .card{padding:var(--s4) 0}
+ .card h3,.card h4{font-size:16px}
+ .panel,.outcome{padding:var(--s4)}
+ .callout,.ai-caution{padding-left:var(--s4)}
+ .catalog-modes{gap:var(--s4)}
+ .catalog-modes button{font-size:14px}
+ .sheet-grid{grid-template-columns:1fr}
+ .next{flex-direction:column;gap:var(--s3)}
+ .site-footer{display:block;padding:var(--s5)}
+ .site-footer>span{display:block}
+ .site-footer>span+span{margin-top:var(--s3)}
+ .section-top{display:block}
+ th,td{padding:var(--s3);min-width:145px}
+ th{white-space:normal}
+ .tree-node{margin-left:var(--s2);padding:var(--s2) var(--s3)}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{
+ .site-header,.sidebar,.search-controls,.catalog-modes,.problem-choices,.actions,.next{display:none}
+ .site-footer{display:block;max-width:none;padding:var(--s4) 0 0;border-top:1px solid #555;color:black}
+ .site-footer>span{display:block}
+ .button,.button:hover{background:white;color:black;border-color:#555}
+ .tablescroll{overflow:visible;border:0;background:white}
+ table{font-size:9pt}
+ th,td{min-width:0}
+ .formula{background:white;border-color:#555}
+ .guardrail{border-top:3px solid #000}
+ .tree-node{border-left-color:#000}
+ details>div{display:block!important}
+ details::details-content{content-visibility:visible!important}
+ .example.fictional-example{background:white;border:2px dashed #555;border-left:4px dashed #000}
+ .fictional-example>.badge,#complete-example>.small>.badge{background:black;color:white;border-color:black}
+ .layout{display:block;padding:0}
+ main{max-width:none}
+ body{font-size:11pt;background:white;color:black}
+ .page-head h1{font-size:25pt}
+ a{color:inherit}
+ details{break-inside:avoid}
+ .card,.metric-card,.example,.home-entry{break-inside:avoid}
+ .panel,.outcome,.metric-card,.tree-node{background:white;color:black}
+ input,textarea{border-color:gray}
+ /* 関係の形（二重・点線・太い左罫・破線）は画面の指定をそのまま使い、色だけ落とす。 */
+ .badge.relation-badge{color:black;background:white;border-color:#555}
+ .grade.a{background:white}
+ .page-head.theme-head{border-color:black}
+ .theme-head .eyebrow{background:white;color:black;border-color:black}
+ .ai-caution{border-color:black}
+ .ai-caution-badge,.ai-caution-label{background:white;color:black;border-color:black}
+}
+</style></head><body><a class="skip" href="#main">本文へ</a><header class="site-header"><div class="header-inner"><a class="brand" href="index.html">開発組織のKPIマネジメント実践ガイド<small>生成AI時代の指標カタログ — 何を測り、どう判断するか。</small></a><nav class="top-nav" aria-label="サイト内"><a href="index.html">はじめに</a><a href="index.html#start">実践ガイド</a><a href="catalog.html">指標カタログ</a><a href="ai.html">生成AIと開発生産性</a><a href="workbook.html" aria-current="page">運用シート</a></nav></div></header><div class="layout"><aside class="sidebar"><div class="sidebar-inner"><p class="nav-label">実践ガイド</p><ol><li><a href="guide-1.html"><span class="chapter-number">01</span> <span>ゴール・KGIを定める</span></a></li><li><a href="guide-2.html"><span class="chapter-number">02</span> <span>CSF・KPIを選ぶ</span></a></li><li><a href="guide-3.html"><span class="chapter-number">03</span> <span>測り方・判断条件を決める</span></a></li><li><a href="guide-4.html"><span class="chapter-number">04</span> <span>行動を決め、実行する</span></a></li><li><a href="guide-5.html"><span class="chapter-number">05</span> <span>成果を確かめ、見直す</span></a></li></ol><p class="nav-label">型と資料を借りる</p><ul><li><a href="workbook.html" aria-current="page">運用シート</a></li><li><a href="templates.html">成果と仕事をつなぐ型</a></li><li><a href="guardrails.html">カウンターメトリクス早見表</a></li><li><a href="roi.html">AI投資のROI</a></li><li><a href="methods.html">用語・枠組み・検証</a></li><li><a href="sources.html">出典と参考値</a></li></ul><p class="small">重点KPIは1つ。<br>数字から次の行動へ。</p></div></aside><main id="main"><section id="content"><header class="page-head"><p class="eyebrow">運用シート / WORKBOOK</p><h1>各章の判断を、一枚に書き残す。</h1><p class="lead">記入例を自社の条件に書き換え、会議で合意してください。</p></header><div class="callout"><h3>入力内容は下書きとして保持されます</h3><p>入力内容はこのブラウザ内に自動保存され、別のページへ移動して戻っても復元されます。外部には送信されません。ブラウザのデータ削除で消えるため、大切な記録は「テキストで保存」でファイルにも残してください。共有端末では利用後に「記入をクリア」を押してください。記入例は架空で、数値や日程は推奨値ではありません。</p></div><div class="actions"><button class="button" type="button" data-example="ai">空欄にAI開発の例を入れる</button><button class="button secondary" type="button" data-example="customer">空欄に顧客利用の例を入れる</button><a href="#complete-example">完成例を読む</a></div><p class="status" id="sheet-status" role="status"></p><p class="status" id="draft-status" role="status"></p><form id="worksheet"><section id="step-1"><h2>01 / 目的と成果</h2><p><a href="guide-1.html">第1章の決め方を読む →</a></p><div class="sheet-grid"><label id="goal">目的とKGI<textarea name="goal" data-label="目的とKGI" placeholder="誰のどんな状態を良くするか。KGIの定義・基準値・目標・達成条件。"></textarea><small>誰のどんな状態を良くするか。KGIの定義・基準値・目標・達成条件。</small></label><label id="scope">対象・期限・成果責任者<textarea name="scope" data-label="対象・期限・成果責任者" placeholder="サービス・顧客・期間と、成果を合意する責任者。"></textarea><small>サービス・顧客・期間と、成果を合意する責任者。</small></label></div></section><section id="step-2"><h2>02 / 制約とKPI</h2><p><a href="guide-2.html">第2章の決め方を読む →</a></p><div class="sheet-grid"><label id="csf">制約とCSF<textarea name="csf" data-label="制約とCSF" placeholder="制約を示す事実と、KGI達成のために最優先で強化するプロセス。"></textarea><small>制約を示す事実と、KGI達成のために最優先で強化するプロセス。</small></label><label id="metric">重点KPIと測定定義<textarea name="metric" data-label="重点KPIと測定定義" placeholder="CSFに対応する候補を1つ選び、式・対象を定義。次の欄の目標値と組にしてKPIを合意する。"></textarea><small>CSFに対応する候補を1つ選び、式・対象を定義。次の欄の目標値と組にしてKPIを合意する。</small></label></div></section><section id="step-3"><h2>03 / 測定・目標・合意</h2><p><a href="guide-3.html">第3章の決め方を読む →</a></p><div class="sheet-grid"><label id="target">基準値・目標・判定日<textarea name="target" data-label="基準値・目標・判定日" placeholder="基準値とばらつきを確認し、必要な水準と実行可能性から決める。目標値は個人の目標欄へ転記しない。"></textarea><small>基準値とばらつきを確認し、必要な水準と実行可能性から決める。目標値は個人の目標欄へ転記しない。</small></label><label id="data">データ源・更新・計測担当<textarea name="data" data-label="データ源・更新・計測担当" placeholder="同じデータで再現できるか。欠損・定義の版も記録する。"></textarea><small>同じデータで再現できるか。欠損・定義の版も記録する。</small></label><label id="guards">カウンターメトリクス（ガードレール指標）と停止・再開条件<textarea name="guards" data-label="カウンターメトリクス（ガードレール指標）と停止・再開条件" placeholder="2〜4個、閾値と違反時の担当・再開条件。"></textarea><small>2〜4個、閾値と違反時の担当・再開条件。</small></label><label id="hypothesis">仮説・比較方法・観測期間<textarea name="hypothesis" data-label="仮説・比較方法・観測期間" placeholder="施策→CSFの改善→KGIのつながりと成立条件。別の要因・他工程・顧客の行動をどう確認するか。"></textarea><small>施策→CSFの改善→KGIのつながりと成立条件。別の要因・他工程・顧客の行動をどう確認するか。</small></label></div></section><section id="step-4"><h2>04 / 行動</h2><p><a href="guide-4.html">第4章の決め方を読む →</a></p><div class="sheet-grid"><label id="action">今週の施策・担当・期限<textarea name="action" data-label="今週の施策・担当・期限" placeholder="数字の目標ではなく、何を変えるかを具体化する。"></textarea><small>数字の目標ではなく、何を変えるかを具体化する。</small></label><label id="support">依存関係・必要な支援<textarea name="support" data-label="依存関係・必要な支援" placeholder="誰に何を決めてもらうか。回答期限も置く。"></textarea><small>誰に何を決めてもらうか。回答期限も置く。</small></label></div></section><section id="step-5"><h2>05 / 見直し</h2><p><a href="guide-5.html">第5章の決め方を読む →</a></p><div class="sheet-grid"><label id="decision">継続・変更・中止の基準<textarea name="decision" data-label="継続・変更・中止の基準" placeholder="どの結果で何を判断するか。安全性は判定日前も確認。"></textarea><small>どの結果で何を判断するか。安全性は判定日前も確認。</small></label><label id="log">判断ログ<textarea name="log" data-label="判断ログ" placeholder="日付・対象数・実績・安全性・解釈・行動・次回確認日。CSF・KPIを替えるときは根拠・判断日・切替日・以前の定義と実績も残す。この欄はチームが記入する。経営・財務側が決めた制約条件が自チームに掛かる場合は、決めた内容をそのまま引用する（自分たちで決め直さない）。引用するのは、前提・閾値・停止と再開の条件、停止を判断する責任者、確認する周期（その指標のページで決めた周期）。変更があったときだけ書き直す。"></textarea><small>日付・対象数・実績・安全性・解釈・行動・次回確認日。CSF・KPIを替えるときは根拠・判断日・切替日・以前の定義と実績も残す。この欄はチームが記入する。経営・財務側が決めた制約条件が自チームに掛かる場合は、決めた内容をそのまま引用する（自分たちで決め直さない）。引用するのは、前提・閾値・停止と再開の条件、停止を判断する責任者、確認する周期（その指標のページで決めた周期）。変更があったときだけ書き直す。</small></label></div></section><div class="actions"><button class="button" type="button" id="download-sheet">テキストで保存</button><button class="button secondary" type="reset">記入をクリア</button></div></form><noscript><p>記入例の補完と保存にはJavaScriptが必要です。下の完成例をコピーして使えます。</p></noscript><section id="complete-example"><h2>完成例：AIを使う開発チーム</h2><p class="small"><span class="badge">記入例・架空</span> 数値・閾値・日程は架空例です。自社の基準値と必要な品質水準で合意してから運用してください。</p><details><summary>目的とKGI</summary><div>顧客が待つ改善を利用できるようにする。KGIは事前に対象とした改善IDのうち、対象顧客5社のすべてで利用をイベントまたは顧客確認により確かめた件数。改善IDごとに1件、重複利用は加算しない。利用を確認できない修正は対象外。前期は同条件で1件、今期は3件を目指す。（数値は仮の例）</div></details><details><summary>対象・期限・成果責任者</summary><div>主力サービスの小規模な修正／今期末／事業責任者。実行責任者は開発マネージャー。</div></details><details><summary>制約とCSF</summary><div>実装後の検証・修正で滞留がある。CSFは差し戻しを減らし、検証・修正を円滑に進めるプロセス。検証準備を実装中へ移す施策もあるため、工程間の付け替えで改善に見えないよう、KPIは着手から品質合格までを測る。工程別の待ち・差し戻しでCSFの改善も確認する。</div></details><details><summary>重点KPIと測定定義</summary><div>品質合格までの作業時間。期間内に品質合格した対象作業について、合格時刻−着手時刻の中央値を集計。対象は同程度の小規模修正。指示・検証・修正と待ちを含む。完了件数に加え、期末未完了件数と最長経過日数を併記し、完了分だけで改善と判定しない。中断は別記。</div></details><details><summary>基準値・目標・判定日</summary><div>基準値は直近4週の中央値3日。KGIで追加する2件は検証・修正が提供予定を遅らせていると仮定。提供枠・案内・利用開始の日程から各件は着手後2日以内の品質合格が必要で、差し戻し記録から1日の短縮余地を見込むため、中央値2日を目標案とする。品質と負荷を守り、4週後に実現性と今期末のKGI達成見込みを再確認する。中央値の達成は対象2件の期限内合格を保証しないので、改善IDごとの予定も追う。（数値・日程・根拠は架空例）</div></details><details><summary>データ源・更新・計測担当</summary><div>チケット状態遷移と検証記録／毎週月曜／分析担当。用途・難易度・モデル版を記録。定義v1。</div></details><details><summary>カウンターメトリクス（ガードレール指標）と停止・再開条件</summary><div>修正に費やす工数率＝修正工数÷対象作業の総工数（上限20%）。合格後の重大な不具合（0件）。チームの時間外総工数（上限10時間／週）。修正工数率または時間外総工数が上限を超えたら拡大停止と既存の依頼量削減、超過が続けば当該施策を停止。重大な不具合なら該当用途の利用を停止。品質条件と負荷の回復を確認し、開発マネージャーが再開を判断。（閾値は仮の例）</div></details><details><summary>仮説・比較方法・観測期間</summary><div>検証手順をAIへの指示と揃えると差し戻しが減り、品質合格が早まる。KGIにつながる条件は、対象改善が予定日に合格し、承認・提供・案内が間に合い、対象顧客5社すべてが今期末までに利用を開始すること。改善IDごとに確認する。時間の短縮率から利用件数を換算しない。同程度の仕事で段階導入し、工程変更と習熟を記録。単純前後比較なら相関として説明する。</div></details><details><summary>今週の施策・担当・期限</summary><div>完了条件と検証手順を揃え、指示テンプレートに反映／開発リーダー／次回定例まで。</div></details><details><summary>依存関係・必要な支援</summary><div>検証環境とレビュー枠の確保をマネージャーに依頼。次回定例までに配分を回答。</div></details><details><summary>継続・変更・中止の基準</summary><div>品質条件を満たし、時間が改善、未完了の滞留も悪化せず、カウンターメトリクス（ガードレール指標）が許容範囲内なら継続。修正工数率だけで品質を判定しない。修正工数率または時間外総工数が上限を超えたら拡大停止と既存の依頼量削減、超過が続けば当該施策を停止。重大な不具合なら該当用途の利用を停止。延長する場合は次に確かめる仮説、必要な対象数、追加予算・工数の上限を事業責任者と再合意し、期限までに判断する。</div></details><details><summary>判断ログ</summary><div>日付：＿＿／完了件数：＿＿／未完了件数・最長経過日数：＿＿／KPI：＿＿／品質条件・カウンターメトリクス（ガードレール指標）：＿＿／分かったこと：＿＿／決めた行動・担当：＿＿／経営・財務側の制約条件（経営・財務側が持つ。前提・閾値・停止と再開の条件・停止を判断する責任者・確認する周期。変更があった週だけ書き直す）：＿＿／次回：＿＿</div></details></section><script type="application/json" id="sheet-data">{"ai": {"goal": "顧客が待つ改善を利用できるようにする。KGIは事前に対象とした改善IDのうち、対象顧客5社のすべてで利用をイベントまたは顧客確認により確かめた件数。改善IDごとに1件、重複利用は加算しない。利用を確認できない修正は対象外。前期は同条件で1件、今期は3件を目指す。（数値は仮の例）", "scope": "主力サービスの小規模な修正／今期末／事業責任者。実行責任者は開発マネージャー。", "csf": "実装後の検証・修正で滞留がある。CSFは差し戻しを減らし、検証・修正を円滑に進めるプロセス。検証準備を実装中へ移す施策もあるため、工程間の付け替えで改善に見えないよう、KPIは着手から品質合格までを測る。工程別の待ち・差し戻しでCSFの改善も確認する。", "metric": "品質合格までの作業時間。期間内に品質合格した対象作業について、合格時刻−着手時刻の中央値を集計。対象は同程度の小規模修正。指示・検証・修正と待ちを含む。完了件数に加え、期末未完了件数と最長経過日数を併記し、完了分だけで改善と判定しない。中断は別記。", "target": "基準値は直近4週の中央値3日。KGIで追加する2件は検証・修正が提供予定を遅らせていると仮定。提供枠・案内・利用開始の日程から各件は着手後2日以内の品質合格が必要で、差し戻し記録から1日の短縮余地を見込むため、中央値2日を目標案とする。品質と負荷を守り、4週後に実現性と今期末のKGI達成見込みを再確認する。中央値の達成は対象2件の期限内合格を保証しないので、改善IDごとの予定も追う。（数値・日程・根拠は架空例）", "data": "チケット状態遷移と検証記録／毎週月曜／分析担当。用途・難易度・モデル版を記録。定義v1。", "guards": "修正に費やす工数率＝修正工数÷対象作業の総工数（上限20%）。合格後の重大な不具合（0件）。チームの時間外総工数（上限10時間／週）。修正工数率または時間外総工数が上限を超えたら拡大停止と既存の依頼量削減、超過が続けば当該施策を停止。重大な不具合なら該当用途の利用を停止。品質条件と負荷の回復を確認し、開発マネージャーが再開を判断。（閾値は仮の例）", "hypothesis": "検証手順をAIへの指示と揃えると差し戻しが減り、品質合格が早まる。KGIにつながる条件は、対象改善が予定日に合格し、承認・提供・案内が間に合い、対象顧客5社すべてが今期末までに利用を開始すること。改善IDごとに確認する。時間の短縮率から利用件数を換算しない。同程度の仕事で段階導入し、工程変更と習熟を記録。単純前後比較なら相関として説明する。", "action": "完了条件と検証手順を揃え、指示テンプレートに反映／開発リーダー／次回定例まで。", "support": "検証環境とレビュー枠の確保をマネージャーに依頼。次回定例までに配分を回答。", "decision": "品質条件を満たし、時間が改善、未完了の滞留も悪化せず、カウンターメトリクス（ガードレール指標）が許容範囲内なら継続。修正工数率だけで品質を判定しない。修正工数率または時間外総工数が上限を超えたら拡大停止と既存の依頼量削減、超過が続けば当該施策を停止。重大な不具合なら該当用途の利用を停止。延長する場合は次に確かめる仮説、必要な対象数、追加予算・工数の上限を事業責任者と再合意し、期限までに判断する。", "log": "日付：＿＿／完了件数：＿＿／未完了件数・最長経過日数：＿＿／KPI：＿＿／品質条件・カウンターメトリクス（ガードレール指標）：＿＿／分かったこと：＿＿／決めた行動・担当：＿＿／経営・財務側の制約条件（経営・財務側が持つ。前提・閾値・停止と再開の条件・停止を判断する責任者・確認する周期。変更があった週だけ書き直す）：＿＿／次回：＿＿"}, "customer": {"goal": "新規顧客が価値を感じて使い続ける。KGIは対象顧客の更新率。", "scope": "法人向けサービスの今期の新規契約顧客／更新期／事業責任者。", "csf": "初回設定で離脱が多い。CSFは初週の初回業務完了までの導入支援プロセス。", "metric": "初回価値到達率。対象週の新規契約社のうち7日以内に初回業務を完了した社数÷同週の新規契約社数。全社の7日観測後に確定。テスト契約は除外。", "target": "直近4週60%を基準に70%を目指す。4週後に判定し、更新期にKGIを確認。（数値・日程は仮の例）", "data": "契約台帳と利用イベントを企業IDで結合／毎週月曜／分析担当。欠損は不明。定義v1。", "guards": "問い合わせ率と時間外対応の上限を基準値から合意する（未合意）。超過時は施策を停止して原因を調べ、責任者が安全性を確認して再開。", "hypothesis": "初回設定の案内を改善すると価値到達率が上がり更新につながる。条件の近い顧客群を比較し、契約周期と季節性を記録する。", "action": "離脱の多い設定手順を顧客と確認し、案内を試す／プロダクト担当／次回定例まで。", "support": "CSの同行枠と分析権限を各責任者に依頼。次回定例までに可否を回答。", "decision": "到達率が改善し負荷も許容なら継続。改善しない場合は仮説と対象を見直す。更新への反映は合意した時期に評価する。", "log": "日付：＿＿／対象数：＿＿／KPI：＿＿／カウンターメトリクス（ガードレール指標）：＿＿／分かったこと：＿＿／決めた行動：＿＿／次回：＿＿"}}</script><script type="application/json" id="metric-data">{"metric-extra-5": "KPI候補（未合意）：初回価値到達率・到達時間。初回価値到達率 = 観測期限を迎えた登録者のうち期限内に価値到達した人数 ÷ 観測期限を迎えた登録者数\n初回価値到達時間 = 初回到達の時刻 − 登録の時刻", "metric-extra-6": "KPI候補（未合意）：主要業務の完了率。主要業務の完了率 = 完了した試行数 ÷ 開始した試行数", "metric-extra-7": "KPI候補（未合意）：問い合わせ解決時間・再問い合わせ率。問い合わせ解決時間 = 解決の時刻 − 受付の時刻\n再問い合わせ率 = 観測期間を満了した解決案件のうち所定期間内に同一問題で再問い合わせがあった案件数 ÷ 観測期間を満了した解決案件数", "metric-l2-01": "KPI候補（未合意）：デプロイ頻度。デプロイ頻度 = 期間内の本番デプロイ（本番環境を持たない提供形態では利用者へのリリース）回数 ÷ 期間", "metric-l2-02": "KPI候補（未合意）：変更のリードタイム。変更のリードタイム = 本番稼働時刻 − 最初のコミット時刻（中央値）", "metric-l2-04": "KPI候補（未合意）：デプロイ復旧時間。デプロイ復旧時間 = 失敗デプロイの復旧時刻 − 失敗したデプロイの時刻（中央値。起点の記録方法を固定）", "metric-l3-02": "KPI候補（未合意）：開発者体験指数。開発者体験指数（DXI） = 利用するDX製品・定義の版に従う\n自社サーベイによる独自指数 = 定めた質問・尺度・集約方法による値（DXIとは別物として記録する）", "metric-l3-03": "KPI候補（未合意）：AI活用率。AI活用率（本資料の定義） = 対象業務での継続活用率\n※算式・対象者の数え方は「対象業務での継続活用率」の定義に従う。", "metric-extra-9": "KPI候補（未合意）：AI業務成功率。AI業務成功率 = 品質判定に合格した案件数 ÷ 評価対象案件数", "metric-extra-11": "KPI候補（未合意）：AIの人手修正率・引継ぎ率。AIの人手修正率 = 修正案件数 ÷ AI処理案件数\nAIの引継ぎ率 = 引継ぎ案件数 ÷ AI処理案件数", "metric-extra-12": "KPI候補（未合意）：AI成功案件あたり総費用。AI成功案件あたり総費用 = 対象期間のAI関連総費用 ÷ 品質合格案件数", "metric-l4-03": "KPI候補（未合意）：MTTD / MTTR / MTBF（平均・全インシデント）。MTTD = 総検知時間（Σ 検知時刻 − 発生時刻） ÷ インシデント件数\n（MTTDの起点は発生に固定する。実際の発生時刻が分からない場合は推定した発生時刻を使い、推定した旨を記録する）\nMTTR = 総復旧時間 ÷ インシデント件数\n（MTTRの起点は発生・検知・報告のいずれかに固定し、どれを使ったかを併記する）\nMTBF = 総稼働時間 ÷ 故障回数", "metric-l4-08": "KPI候補（未合意）：テストカバレッジ・自動化率。行カバレッジ = 実行された行数 ÷ 実行可能な行数\n分岐カバレッジ = 実行された分岐数 ÷ 対象の分岐数\nテスト自動化率 = 自動実行できるテスト数 ÷ 対象テスト数", "metric-l4-09": "KPI候補（未合意）：技術的負債の指標。技術的負債比率 = 負債の修正見積 ÷ 開発総コスト", "metric-extra-14": "KPI候補（未合意）：復旧目標と復旧訓練の達成率。復旧訓練の達成率 = RTO・RPO双方を満たした訓練数 ÷ 実施訓練数", "metric-extra-16": "KPI候補（未合意）：セキュリティ検査の対象網羅率。セキュリティ検査の対象網羅率 = 期限内に必要検査を完了した資産 ÷ 台帳上の対象資産", "metric-extra-17": "KPI候補（未合意）：データの完全性・一意性。データの完全性 = 非欠損の必須セル数 ÷ 必須セル総数\nデータの重複率 = 余分な重複レコード数 ÷ 全レコード数", "metric-extra-18": "KPI候補（未合意）：データの妥当性・整合性・正確性。データの妥当性・整合性・正確性の各合格率 = 各検査の合格件数 ÷ その検査の対象件数", "metric-extra-19": "KPI候補（未合意）：データの鮮度。データの更新遅延 = 利用可能の時刻 − 対象イベントの時刻\nデータの期限遵守率 = 期限内更新数 ÷ 予定更新数", "metric-extra-20": "KPI候補（未合意）：アクセシビリティの未解決課題。アクセシビリティの未解決課題件数 = 対象範囲で確認済みの未修正の達成基準違反数", "metric-l5-03": "KPI候補（未合意）：レビュー応答時間。レビュー応答時間 = 人による最初の有効な判断の時刻 − PR作成時刻（中央値）", "metric-l5-04": "KPI候補（未合意）：スループット。スループット = 期間内の完了アイテム数", "metric-l5-05": "KPI候補（未合意）：フロー効率。フロー効率 = 実作業状態だった経過時間 ÷ 開始から完了までの経過時間", "metric-l5-06": "KPI候補（未合意）：WIP・仕掛かり。WIP・仕掛かり = ある時点で着手済み・未完了のアイテム数\n安定した流れでの平均サイクルタイム = 平均WIP ÷ 平均スループット", "metric-extra-21": "KPI候補（未合意）：未完了作業の経過時間。未完了作業の経過時間 = 現在時刻 − 着手時刻", "metric-extra-22": "KPI候補（未合意）：修正に費やす工数率。修正に費やす工数率 = 変更に起因する修正時間 ÷ 同期間の総作業時間", "metric-extra-23": "KPI候補（未合意）：ビルド待ち時間・不安定テスト率。ビルド待ち時間 = 結果通知の時刻 − 検査依頼の時刻\n不安定テスト率 = 同条件で結果が揺れたテスト数 ÷ 評価したテスト数", "metric-extra-24": "KPI候補（未合意）：社内基盤の自己解決率。社内基盤の自己解決率 = 支援なしで成功した依頼数 ÷ 対象依頼数", "metric-l6-03": "KPI候補（未合意）：オンボーディング速度。オンボーディング速度 = 初回本番デプロイ日 − 入社日", "metric-l7-02": "KPI候補（未合意）：機能あたり開発コスト。機能あたり開発コスト = (関与人数 × 期間 × 人月単価) ÷ 機能数", "metric-l7-03": "KPI候補（未合意）：クラウドコスト効率。クラウドコスト効率（売上高あたり） = クラウド費用 ÷ 売上高\nクラウドコスト効率（利用者あたり） = クラウド費用 ÷ アクティブユーザー数", "metric-extra-28": "KPI候補（未合意）：社内業務の自動完結率。社内業務の自動完結率 = 人手なしで正常完了した案件 ÷ 対象業務の全案件", "metric-ai-adoption": "KPI候補（未合意）：対象業務での継続活用率。対象業務での継続活用率 = 合意した継続条件を満たす対象者数 ÷ 利用機会のある対象者数", "metric-ai-completion": "KPI候補（未合意）：品質合格までの作業時間。品質合格までの作業時間 = 品質合格の時刻 − 合意した着手の時刻\n人の実作業時間は別に記録する", "metric-ai-agent": "KPI候補（未合意）：開発エージェントのタスク成功率。開発エージェントのタスク成功率 = 条件を満たしたタスク数 ÷ 評価対象タスク数", "metric-ai-review-wait": "KPI候補（未合意）：AI関与変更のレビュー待ち時間。AI関与変更のレビュー待ち時間 = 人による最初の有効な判断の時刻 − レビュー可能になった時刻\n対象は来歴記録で関与ありと記録された変更に限る"}</script></section></main></div><footer class="site-footer"><span>開発組織のKPIマネジメント実践ガイド · 数字から次の行動へ<br>© 2026 Michinao Shimizu</span><span>本サイトの運用シートの入力は端末内で処理します。 <a href="sources.html">出典・利用上の前提</a></span></footer><script id="app-script">'use strict';
+function downloadText(name,text){const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function normalizeSearch(value){return value.normalize('NFKC').trim().toLocaleLowerCase();}
+function matchesMetric(text,query){return normalizeSearch(query).split(/\s+/).filter(Boolean).every(word=>normalizeSearch(text).includes(word));}
+document.querySelectorAll('form').forEach(form=>form.addEventListener('submit',event=>event.preventDefault()));
+const search=document.getElementById('metric-search');
+if(search){
+ const domain=document.getElementById('domain-filter'),rows=[...document.querySelectorAll('.metric-card')];
+ const modes=document.getElementById('catalog-modes'),choices=[...document.querySelectorAll('[data-problem]')];
+ let selected=null;
+ const groups=[...document.querySelectorAll('[data-metric-group]')];
+ const filter=()=>{let count=0;rows.forEach(row=>{row.hidden=!(matchesMetric(row.dataset.search,search.value)&&(!domain.value||row.dataset.domain===domain.value)&&(!selected||selected.includes(row.dataset.metricId)));if(!row.hidden)count++;});groups.forEach(group=>{const visible=rows.filter(row=>row.dataset.domain===group.dataset.metricGroup&&!row.hidden);group.hidden=visible.length===0;group.querySelector('h2 span').textContent=`（${visible.length}件）`;});document.getElementById('metric-status').textContent=`${rows.length}件中 ${count}件を表示`;document.getElementById('empty-state').hidden=count!==0;};
+ search.addEventListener('input',filter);domain.addEventListener('change',filter);
+ if(modes){
+  const buttons=[...document.querySelectorAll('[data-catalog-mode]')];
+  const choose=button=>{selected=button.dataset.metrics.split(' ');choices.forEach(b=>b.setAttribute('aria-pressed',String(b===button)));filter();};
+  const switchMode=mode=>{search.value='';domain.value='';selected=null;buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.catalogMode===mode)));['all','problem','name','domain'].forEach(key=>document.getElementById('catalog-'+key).hidden=key!==mode);if(mode==='problem'&&choices.length)choose(choices.find(b=>b.getAttribute('aria-pressed')==='true')||choices[0]);else filter();};
+  choices.forEach(button=>button.addEventListener('click',()=>choose(button)));
+  buttons.forEach(button=>button.addEventListener('click',()=>switchMode(button.dataset.catalogMode)));
+  modes.hidden=false;switchMode('all');
+ }else filter();
+}
+const sheet=document.getElementById('worksheet');
+if(sheet){
+ const fields=[...sheet.querySelectorAll('textarea')],status=document.getElementById('sheet-status');
+ const draftStatus=document.getElementById('draft-status');
+ const draftKey='kpi-operating-sheet:v1:'+window.location.pathname;
+ let draftFailed=false;
+ function saveDraft(){
+  try{
+   window.localStorage.setItem(draftKey,JSON.stringify(Object.fromEntries(fields.map(f=>[f.name,f.value]))));
+   draftFailed=false;
+   if(draftStatus)draftStatus.textContent='下書きをこのブラウザに保存しました。';
+   return true;
+  }catch{
+   draftFailed=true;
+   if(draftStatus)draftStatus.textContent='このブラウザでは下書きを保存できません。ページを離れる前に「テキストで保存」を押してください。';
+   return false;
+  }
+ }
+ try{
+  const draft=JSON.parse(window.localStorage.getItem(draftKey));
+  if(draft&&typeof draft==='object'&&!Array.isArray(draft)&&fields.every(f=>typeof draft[f.name]==='string')){
+   fields.forEach(f=>{f.value=draft[f.name];});
+   if(draftStatus)draftStatus.textContent='このブラウザに保存した下書きを復元しました。';
+  }
+ }catch{if(draftStatus)draftStatus.textContent='下書きを読み込めませんでした。保存済みのテキストがあれば転記してください。';}
+ sheet.addEventListener('input',saveDraft);
+ window.addEventListener('beforeunload',event=>{if(draftFailed){event.preventDefault();event.returnValue='';}});
+ const examples=JSON.parse(document.getElementById('sheet-data').textContent),metrics=JSON.parse(document.getElementById('metric-data').textContent);
+ function setFields(values,emptyOnly){
+  const allowed=new Set(fields.map(f=>f.name));
+  if(!values||typeof values!=='object'||Array.isArray(values)||Object.entries(values).some(([k,v])=>!allowed.has(k)||typeof v!=='string'||v.length>20000))throw new Error('既定の項目名と文字列を指定してください。');
+  let count=0;fields.forEach(f=>{if(Object.hasOwn(values,f.name)&&(!emptyOnly||!f.value.trim())){f.value=values[f.name];count++;}});status.textContent=`${count}項目を記入しました。自社の条件に書き換え、未合意の条件を埋めてください。`;saveDraft();return {updated:count};
+ }
+ document.querySelectorAll('[data-example]').forEach(button=>button.addEventListener('click',()=>setFields(examples[button.dataset.example],true)));
+ document.getElementById('download-sheet').addEventListener('click',()=>{if(!fields.some(f=>f.value.trim())){status.textContent='項目を記入してから保存してください。';return;}downloadText('kpi-operating-sheet.txt','KPIマネジメント運用シート\n\n'+fields.map(f=>f.dataset.label+'\n'+(f.value.trim()||'未記入')).join('\n\n'));status.textContent='ダウンロードを開始しました。未合意の条件を確認して運用を始めてください。';});
+ sheet.addEventListener('reset',()=>{fields.forEach(f=>{f.value='';});status.textContent=saveDraft()?'記入内容とブラウザ内の下書きをクリアしました。':'表示中の記入内容をクリアしました。ブラウザ内の下書きは更新できていません。';});
+ const params=new URLSearchParams(window.location.search),id=params.get('metric');
+ if(id&&Object.hasOwn(metrics,id)){setFields({metric:metrics[id]},true);}
+ if(params.get('example')&&Object.hasOwn(examples,params.get('example')))setFields(examples[params.get('example')],true);
+ // Optional WebMCP surface mirrors the visible sheet and its local draft.
+ if(document.modelContext?.registerTool){const lifecycle=new AbortController();window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});try{Promise.resolve(document.modelContext.registerTool({name:'stage_kpi_operating_sheet',title:'KPIマネジメント運用シートを記入',description:'表示中のKPIマネジメント運用シートを指定した文字列で記入する。下書きはこのブラウザに保存する。外部送信は行わない。',inputSchema:{type:'object',properties:{fields:{type:'object',properties:Object.fromEntries(fields.map(f=>[f.name,{type:'string',maxLength:20000}])),additionalProperties:false}},required:['fields'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||typeof input!=='object'||Object.keys(input).some(k=>k!=='fields'))throw new Error('fieldsのみ指定してください。');return setFields(input.fields,false);}},{signal:lifecycle.signal})).catch(()=>{});}catch{/* Standard form remains usable. */}}
+}
+document.querySelectorAll('[data-tree]').forEach(button=>button.addEventListener('click',()=>document.querySelectorAll('.branch').forEach(branch=>branch.open=button.dataset.tree==='open')));
+if(typeof window!=='undefined'){
+ const reveal=()=>{let id;try{id=decodeURIComponent(window.location.hash.slice(1));}catch{return;}const target=document.getElementById(id);if(!target)return;for(let n=target;n;n=n.parentElement){if(n.tagName==='DETAILS')n.open=true;}if(window.location.hash)target.scrollIntoView({block:'start'});};
+ window.addEventListener('hashchange',reveal);reveal();
+}
+if(typeof module!=='undefined')module.exports={normalizeSearch,matchesMetric};
+</script></body></html>
