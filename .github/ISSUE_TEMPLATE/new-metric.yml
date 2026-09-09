@@ -1,0 +1,37 @@
+name: 指標の提案
+description: 載せてほしい指標、または指標の追加・変更の提案
+title: "[指標の提案] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **このissueは公開されます。**自社の実測値・体制・顧客名などの固有名詞は書かないでください。指標の定義と出典の話として書いていただけると、そのまま検討できます。投稿にはGitHubのアカウントが必要です。いただいた内容への回答・掲載を約束するものではありません。
+  - type: input
+    id: name
+    attributes:
+      label: 指標の名前
+      placeholder: 例：変更失敗率
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: 何の判断に使う指標か
+      description: どんな場面で、誰が、何を決めるために見る数字かを書いてください。
+    validations:
+      required: true
+  - type: textarea
+    id: formula
+    attributes:
+      label: 計算式・数え方（案）
+      description: 分子・分母・期間・母集団が分かる形で書いてください。分からない部分は空欄で構いません。
+  - type: textarea
+    id: source
+    attributes:
+      label: 出典
+      description: 定義や参考値の出どころ（URL・書名・調査名と対象・時期）。出典がない場合はその旨を書いてください。
+  - type: textarea
+    id: pair
+    attributes:
+      label: 対にする指標（あれば）
+      description: この指標が良くなるときに悪化しうるもの（品質・人の負荷・費用・測り方・顧客）。

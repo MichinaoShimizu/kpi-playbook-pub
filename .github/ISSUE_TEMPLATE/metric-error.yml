@@ -1,0 +1,27 @@
+name: 記載の誤り・出典との食い違い
+description: 掲載中の指標の説明・計算式・数値・出典の誤りの指摘
+title: "[記載の誤り] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **このissueは公開されます。**自社の実測値・体制・顧客名などの固有名詞は書かないでください。指標の定義と出典の話として書いていただけると、そのまま検討できます。投稿にはGitHubのアカウントが必要です。いただいた内容への回答・掲載を約束するものではありません。
+  - type: input
+    id: page
+    attributes:
+      label: 該当ページのURL
+      placeholder: https://michinaoshimizu.github.io/kpi-playbook-pub/metric-l2-01.html
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: どこが、どう違うか
+      description: 現在の記述と、正しいと考える記述を並べて書いてください。
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: 根拠
+      description: 一次出典のURL・書名・該当箇所（章・表番号・ページ）。

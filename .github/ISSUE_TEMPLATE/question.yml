@@ -1,0 +1,15 @@
+name: その他の問い合わせ
+description: 読みにくい箇所、使い方の質問、そのほかの連絡
+title: "[問い合わせ] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **このissueは公開されます。**自社の実測値・体制・顧客名などの固有名詞は書かないでください。指標の定義と出典の話として書いていただけると、そのまま検討できます。投稿にはGitHubのアカウントが必要です。いただいた内容への回答・掲載を約束するものではありません。
+  - type: textarea
+    id: body
+    attributes:
+      label: 内容
+      description: 該当ページのURLがあれば添えてください。
+    validations:
+      required: true
