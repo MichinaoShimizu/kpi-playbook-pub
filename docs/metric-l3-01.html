@@ -46,7 +46,7 @@ return {linked:pair.filter(p=>p[1]),plain:pair.filter(p=>!p[1]),paired:!!(entry&
 }
 document.querySelectorAll('form').forEach(form=>form.addEventListener('submit',event=>event.preventDefault()));
 const search=document.getElementById('metric-search');
-if(search){
+if(search&&document.getElementById('domain-filter')){
 const domain=document.getElementById('domain-filter'),rows=[...document.querySelectorAll('.metric-card')];
 const filters=document.getElementById('catalog-filters'),problem=document.getElementById('problem-filter');
 const choices=[...document.querySelectorAll('[data-problem]')];
@@ -132,7 +132,7 @@ filters.hidden=false;
 filter();
 }
 const sheet=document.getElementById('worksheet');
-if(sheet){
+if(sheet&&document.getElementById('sheet-data')){
 const fields=[...sheet.querySelectorAll('textarea')],status=document.getElementById('sheet-status');
 const draftStatus=document.getElementById('draft-status');
 const draftKey='kpi-operating-sheet:v1:'+window.location.pathname;
