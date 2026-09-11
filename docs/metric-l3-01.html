@@ -297,7 +297,6 @@ if(clearPicks)clearPicks.addEventListener('click',()=>{picks={ids:[],focus:null}
 if(candidatePanel)candidatePanel.hidden=false;
 render();
 }
-document.querySelectorAll('[data-tree]').forEach(button=>button.addEventListener('click',()=>document.querySelectorAll('.branch').forEach(branch=>branch.open=button.dataset.tree==='open')));
 if(typeof window!=='undefined'&&typeof document!=='undefined'&&typeof document.querySelector==='function'&&typeof window.getComputedStyle==='function'){
 const header=document.querySelector('.site-header');
 if(header){
